@@ -11,11 +11,11 @@ export default defineConfig({
     port: 1995,
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'http://localhost:1995',
         changeOrigin: true
       },
       '/content': {
-        target: 'http://localhost:3000',
+        target: 'http://localhost:1995',
         changeOrigin: true
       }
     }

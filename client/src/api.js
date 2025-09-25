@@ -52,5 +52,20 @@ export default {
   // 获取推荐作品（带有#推荐标签的作品）
   getRecommendedWorks() {
     return api.get('/works/recommended')
+  },
+
+  // 获取首页配置
+  getHomeConfig() {
+    return api.get('/home')
+  },
+
+  // 获取导航页面
+  getNavPages() {
+    return api.get('/nav-pages')
+  },
+
+  // 获取特定页面
+  getPage(pageName) {
+    return api.get(`/pages/${encodeURIComponent(pageName)}`)
   }
 }

@@ -1,10 +1,9 @@
 <template>
   <div class="home">
-    <!-- Hero Section - 参考 smirapdesigns.com -->
-    <div class="hero">
+    <!-- Hero Section - 动态内容 -->
+    <div v-if="homeConfig && homeConfig.hasConfig" class="hero">
       <div class="container">
-        <h1>Hello! Welcome to my portfolio</h1>
-        <p>email</p>
+        <div v-html="homeConfig.parsedContent.html"></div>
       </div>
     </div>
 
@@ -52,6 +51,7 @@ export default {
   setup() {
     const router = useRouter()
     const recommendedWorks = ref([])
+    const homeConfig = ref(null)
     const loading = ref(true)
     const error = ref('')
 
@@ -69,16 +69,27 @@ export default {
       }
     }
 
+    const loadHomeConfig = async () => {
+      try {
+        const data = await api.getHomeConfig()
+        homeConfig.value = data
+      } catch (err) {
+        console.error('加载首页配置失败:', err)
+      }
+    }
+
     const goToWork = (categoryName, workName) => {
       router.push(`/work/${encodeURIComponent(categoryName)}/${encodeURIComponent(workName)}`)
     }
 
     onMounted(() => {
       loadRecommendedWorks()
+      loadHomeConfig()
     })
 
     return {
       recommendedWorks,
+      homeConfig,
       loading,
       error,
       loadRecommendedWorks,
@@ -92,13 +103,17 @@ export default {
 /* 参考 smirapdesigns.com 的首页设计 */
 .hero {
   background: #fafafa;
-  padding: 100px 0 80px 0;
+  padding: 50px 0;
   text-align: center;
   border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
 }
 
 .hero h1 {
-  font-size: 56px;
+  font-size: 72px;
   font-weight: 700;
   margin-bottom: 20px;
   color: #2c2c2c;
@@ -112,8 +127,57 @@ export default {
   font-weight: 400;
 }
 
+/* 首页 Markdown 内容段间距 */
+.hero :deep(p) {
+  margin-bottom: 20px;
+}
+
+.hero :deep(h1) {
+  font-size: 72px;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #2c2c2c;
+  letter-spacing: -1px;
+  line-height: 1.1;
+}
+
+.hero :deep(h2),
+.hero :deep(h3),
+.hero :deep(h4),
+.hero :deep(h5),
+.hero :deep(h6) {
+  margin-top: 30px;
+  margin-bottom: 15px;
+}
+
+.hero :deep(ul),
+.hero :deep(ol) {
+  margin-bottom: 20px;
+  padding-left: 20px;
+}
+
+.hero :deep(li) {
+  margin-bottom: 8px;
+}
+
+.hero :deep(blockquote) {
+  margin: 20px 0;
+  padding: 15px 20px;
+  border-left: 4px solid #e0e0e0;
+  background-color: #f9f9f9;
+  font-style: italic;
+}
+
+.hero :deep(hr) {
+  margin: 30px 0;
+  border: none;
+  height: 1px;
+  background-color: #e0e0e0;
+}
+
 .works-grid {
-  padding: 80px 0;
+  padding: 0;
 }
 
 .work-card {

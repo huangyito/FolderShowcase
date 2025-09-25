@@ -7,7 +7,7 @@
         </h1>
         <nav class="nav">
           <div class="nav-item dropdown">
-            <a href="#" class="nav-link dropdown-toggle">作品</a>
+            <router-link to="/" class="nav-link dropdown-toggle">作品</router-link>
             <div class="dropdown-menu">
               <router-link to="/" class="dropdown-item">全部作品</router-link>
               <router-link 
@@ -20,9 +20,14 @@
               </router-link>
             </div>
           </div>
-          <router-link to="/about" class="nav-link">关于/联系</router-link>
-          <router-link to="/shop" class="nav-link">商店</router-link>
-          <router-link to="/downloads" class="nav-link">下载</router-link>
+          <router-link 
+            v-for="page in navPages" 
+            :key="page.name"
+            :to="`/page/${encodeURIComponent(page.name)}`" 
+            class="nav-link"
+          >
+            {{ page.title }}
+          </router-link>
         </nav>
       </div>
     </header>
@@ -50,6 +55,7 @@ export default {
     const router = useRouter()
     const searchQuery = ref('')
     const categories = ref([])
+    const navPages = ref([])
     const loading = ref(true)
 
     const search = () => {
@@ -70,14 +76,25 @@ export default {
       }
     }
 
+    const loadNavPages = async () => {
+      try {
+        const data = await api.getNavPages()
+        navPages.value = data
+      } catch (error) {
+        console.error('加载导航页面失败:', error)
+      }
+    }
+
     onMounted(() => {
       loadCategories()
+      loadNavPages()
     })
 
     return {
       searchQuery,
       search,
       categories,
+      navPages,
       loading
     }
   }

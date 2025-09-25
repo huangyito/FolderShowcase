@@ -5,12 +5,14 @@ import Home from './views/Home.vue'
 import Category from './views/Category.vue'
 import Work from './views/Work.vue'
 import About from './views/About.vue'
+import Page from './views/Page.vue'
 import './style.css'
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
   { path: '/category/:name', name: 'Category', component: Category },
   { path: '/work/:category/:work', name: 'Work', component: Work },
+  { path: '/page/:pageName', name: 'Page', component: Page },
   { path: '/about', name: 'About', component: About }
 ]
 

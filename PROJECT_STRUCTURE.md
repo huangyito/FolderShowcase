@@ -77,14 +77,14 @@ mkdir -p /volume1/docker/foldershowcase/content
 ### 开发环境
 ```bash
 CONTENT_DIR=./content
-PORT=3000
+PORT=1995
 NODE_ENV=development
 ```
 
 ### 生产环境
 ```bash
 CONTENT_HOST_PATH=/volume1/docker/portfolio/content
-PORT=3000
+PORT=1995
 NODE_ENV=production
 ```
 

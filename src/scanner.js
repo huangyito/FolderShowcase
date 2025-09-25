@@ -18,14 +18,14 @@ class PortfolioScanner {
     }
   }
 
-  // 获取所有分类
+  // 获取所有分类（排除 home 文件夹）
   async getCategories() {
     try {
       const items = await fs.readdir(this.contentDir, { withFileTypes: true });
       const categories = [];
 
       for (const item of items) {
-        if (item.isDirectory()) {
+        if (item.isDirectory() && item.name !== 'home') {
           const categoryPath = path.join(this.contentDir, item.name);
           const works = await this.getWorksByCategory(item.name);
           
@@ -44,6 +44,132 @@ class PortfolioScanner {
       return [];
     }
   }
+
+  // 获取首页配置
+  async getHomeConfig() {
+    try {
+      const homePath = path.join(this.contentDir, 'home');
+      const homeMdPath = path.join(homePath, 'home.md');
+      
+      // 检查 home 文件夹和 home.md 文件是否存在
+      if (!await fs.pathExists(homePath) || !await fs.pathExists(homeMdPath)) {
+        return null;
+      }
+
+      // 读取 home.md 文件
+      const content = await fs.readFile(homeMdPath, 'utf-8');
+      
+      // 首页保留一级标题，因为首页没有单独的标题区域
+      const parsedContent = await this.parser.parseMarkdown(content, homePath);
+      
+      return {
+        hasConfig: true,
+        content: content,
+        parsedContent: parsedContent,
+        title: this.extractTitle(content)
+      };
+    } catch (error) {
+      console.error('获取首页配置失败:', error);
+      return null;
+    }
+  }
+
+  // 获取导航页面（从 home 文件夹下的子文件夹获取）
+  async getNavPages() {
+    try {
+      const homePath = path.join(this.contentDir, 'home');
+      const pages = [];
+
+      // 检查 home 文件夹是否存在
+      if (!await fs.pathExists(homePath)) {
+        return pages;
+      }
+
+      const items = await fs.readdir(homePath, { withFileTypes: true });
+
+      for (const item of items) {
+        if (item.isDirectory()) {
+          const pagePath = path.join(homePath, item.name);
+          const pageInfo = await this.getPageInfo(item.name, pagePath);
+          if (pageInfo) {
+            pages.push(pageInfo);
+          }
+        }
+      }
+
+      return pages.sort((a, b) => a.name.localeCompare(b.name));
+    } catch (error) {
+      console.error('获取导航页面失败:', error);
+      return [];
+    }
+  }
+
+  // 获取页面信息
+  async getPageInfo(pageName, pagePath) {
+    try {
+      // 查找页面文件夹中的 .md 文件
+      const items = await fs.readdir(pagePath, { withFileTypes: true });
+      let markdownFile = null;
+      
+      // 查找 .md 文件
+      for (const item of items) {
+        if (item.isFile() && item.name.endsWith('.md')) {
+          markdownFile = path.join(pagePath, item.name);
+          break;
+        }
+      }
+
+      let title = pageName; // 直接使用文件夹名称作为标题
+      let content = '';
+      let parsedContent = null;
+
+      // 检查是否存在 Markdown 文件
+      if (markdownFile && await fs.pathExists(markdownFile)) {
+        content = await fs.readFile(markdownFile, 'utf-8');
+        
+        // 移除一级标题，避免重复显示
+        const contentWithoutTitle = this.removeFirstTitle(content);
+        
+        // 解析 Markdown 内容（不包含一级标题）
+        parsedContent = await this.parser.parseMarkdown(contentWithoutTitle, pagePath);
+      } else {
+        // 没有 Markdown 文件时，创建一个简单的 HTML 结构
+        parsedContent = {
+          html: `<p>这是一个页面。</p>`,
+          metadata: {}
+        };
+      }
+
+      return {
+        name: pageName,
+        title, // 使用文件夹名称作为标题
+        content,
+        parsedContent,
+        path: pagePath,
+        relativePath: path.relative(this.contentDir, pagePath),
+        hasMarkdown: markdownFile && await fs.pathExists(markdownFile)
+      };
+    } catch (error) {
+      console.error(`获取页面 ${pageName} 信息失败:`, error);
+      return null;
+    }
+  }
+
+  // 移除内容中的第一个一级标题
+  removeFirstTitle(content) {
+    const lines = content.split('\n');
+    let foundFirstTitle = false;
+    
+    return lines.filter(line => {
+      const trimmed = line.trim();
+      if (!foundFirstTitle && trimmed.startsWith('# ')) {
+        foundFirstTitle = true;
+        return false; // 跳过第一个一级标题
+      }
+      return true;
+    }).join('\n');
+  }
+
 
   // 获取分类下的所有作品
   async getWorksByCategory(categoryName) {
@@ -83,6 +209,9 @@ class PortfolioScanner {
         title = this.extractTitle(content);
       }
 
+      // 去掉标题中的 [推荐] 标记
+      title = title.replace(/\[推荐\]/g, '').trim();
+
       // 查找封面图片
       const coverImage = await this.findCoverImage(workPath);
 
@@ -116,8 +245,12 @@ class PortfolioScanner {
       if (await fs.pathExists(markdownFile)) {
         content = await fs.readFile(markdownFile, 'utf-8');
         title = this.extractTitle(content);
-        // 解析 Markdown 内容
-        parsedContent = await this.parser.parseMarkdown(content, workPath);
+        
+        // 移除一级标题，避免重复显示
+        const contentWithoutTitle = this.removeFirstTitle(content);
+        
+        // 解析 Markdown 内容（不包含一级标题）
+        parsedContent = await this.parser.parseMarkdown(contentWithoutTitle, workPath);
       } else {
         // 没有 Markdown 文件时，创建一个简单的 HTML 结构
         parsedContent = {
@@ -181,28 +314,41 @@ class PortfolioScanner {
         }
       }
 
-      return recommendedWorks;
+      // 按推荐标记排序，[推荐]标记的作品优先显示
+      return recommendedWorks.sort((a, b) => {
+        const aIsRecommended = a.name.includes('[推荐]');
+        const bIsRecommended = b.name.includes('[推荐]');
+        
+        if (aIsRecommended && !bIsRecommended) return -1;
+        if (!aIsRecommended && bIsRecommended) return 1;
+        return 0;
+      });
     } catch (error) {
       console.error('获取推荐作品失败:', error);
       return [];
     }
   }
 
-  // 检查作品是否包含#推荐标签
+  // 检查作品是否包含[推荐]标签
   async hasRecommendedTag(workPath) {
     try {
-      const markdownFile = path.join(workPath, '作品介绍.md');
+      const workName = path.basename(workPath);
       
-      if (!await fs.pathExists(markdownFile)) {
-        return false;
+      // 方法1：检查文件夹名称是否包含 [推荐] 标记
+      if (workName.includes('[推荐]')) {
+        return true;
       }
-
-      const content = await fs.readFile(markdownFile, 'utf-8');
       
-      // 检查是否包含推荐标签（支持引用格式 > #推荐标签 或 > #其他标签 #推荐）
-      return content.includes('> #推荐标签') || content.includes('> # 推荐标签') || 
-             (content.includes('>') && content.includes('#推荐')) || 
-             content.includes('#推荐') || content.includes('# 推荐');
+      // 方法2：检查 Markdown 文件中的 [推荐] 标签
+      const markdownFile = path.join(workPath, '作品介绍.md');
+      if (await fs.pathExists(markdownFile)) {
+        const content = await fs.readFile(markdownFile, 'utf-8');
+        if (content.includes('[推荐]')) {
+          return true;
+        }
+      }
+      
+      return false;
     } catch (error) {
       console.error('检查推荐标签失败:', error);
       return false;

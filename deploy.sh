@@ -34,7 +34,7 @@ echo "🚀 启动服务..."
 docker-compose up -d
 
 echo "✅ 部署完成！"
-echo "🌐 网站地址: http://your-nas-ip:3000"
+echo "🌐 网站地址: http://your-nas-ip:1995"
 echo "📁 内容文件夹: $CONTENT_HOST_PATH"
 echo ""
 echo "📋 常用命令:"

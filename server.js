@@ -54,13 +54,7 @@ app.get('/api/categories/:category/works/:work', async (req, res) => {
       return res.status(404).json({ error: '作品不存在' });
     }
 
-    // 解析 Markdown 内容
-    const parsedContent = await parser.parseMarkdown(workDetail.content, workDetail.workPath);
-    
-    res.json({
-      ...workDetail,
-      parsedContent
-    });
+    res.json(workDetail);
   } catch (error) {
     console.error('获取作品详情失败:', error);
     res.status(500).json({ error: '获取作品详情失败' });
@@ -77,6 +71,47 @@ app.get('/api/works/recommended', async (req, res) => {
     res.status(500).json({ error: '获取推荐作品失败' });
   }
 });
+
+// 获取首页配置
+app.get('/api/home', async (req, res) => {
+  try {
+    const homeConfig = await scanner.getHomeConfig();
+    res.json(homeConfig);
+  } catch (error) {
+    console.error('获取首页配置失败:', error);
+    res.status(500).json({ error: '获取首页配置失败' });
+  }
+});
+
+// 获取导航页面
+app.get('/api/nav-pages', async (req, res) => {
+  try {
+    const navPages = await scanner.getNavPages();
+    res.json(navPages);
+  } catch (error) {
+    console.error('获取导航页面失败:', error);
+    res.status(500).json({ error: '获取导航页面失败' });
+  }
+});
+
+// 获取特定页面
+app.get('/api/pages/:pageName', async (req, res) => {
+  try {
+    const { pageName } = req.params;
+    const navPages = await scanner.getNavPages();
+    const page = navPages.find(p => p.name === pageName);
+    
+    if (!page) {
+      return res.status(404).json({ error: '页面不存在' });
+    }
+    
+    res.json(page);
+  } catch (error) {
+    console.error('获取页面失败:', error);
+    res.status(500).json({ error: '获取页面失败' });
+  }
+});
+
 
 // 获取所有作品（用于搜索）
 app.get('/api/works', async (req, res) => {
