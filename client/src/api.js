@@ -67,5 +67,10 @@ export default {
   // 获取特定页面
   getPage(pageName) {
     return api.get(`/pages/${encodeURIComponent(pageName)}`)
+  },
+
+  // 获取网站配置
+  getConfig() {
+    return api.get('/config')
   }
 }

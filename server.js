@@ -8,6 +8,7 @@ const { MarkdownParser } = require('./src/parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const CONTENT_DIR = process.env.CONTENT_DIR || path.join(__dirname, 'content');
+const SITE_NAME = process.env.SITE_NAME || '作品分享网站';
 
 // 中间件
 app.use(cors());
@@ -20,6 +21,15 @@ const scanner = new PortfolioScanner(CONTENT_DIR);
 const parser = new MarkdownParser();
 
 // API 路由
+
+// 获取网站配置
+app.get('/api/config', (req, res) => {
+  res.json({
+    siteName: SITE_NAME,
+    port: PORT,
+    contentDir: CONTENT_DIR
+  });
+});
 
 // 获取所有分类
 app.get('/api/categories', async (req, res) => {

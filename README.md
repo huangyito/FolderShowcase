@@ -45,13 +45,29 @@
 
 ## 🚀 快速开始
 
-### 1. 克隆项目
+### 方式一：Docker 部署（推荐）
+
+```bash
+# 拉取最新镜像
+docker pull your-username/foldershowcase:latest
+
+# 运行容器
+docker run -d \
+  --name foldershowcase \
+  -p 1995:1995 \
+  -v /path/to/your/content:/app/content:ro \
+  your-username/foldershowcase:latest
+```
+
+### 方式二：源码部署
+
+#### 1. 克隆项目
 ```bash
 git clone <your-repo-url> FolderShowcase
 cd FolderShowcase
 ```
 
-### 2. 配置环境
+#### 2. 配置环境
 ```bash
 # 复制环境配置文件
 cp env.example .env
@@ -260,4 +276,56 @@ docker-compose down
 # 更新服务
 docker-compose pull && docker-compose up -d
 ```
+
+## 🚀 发布和更新
+
+### 自动发布流程
+
+项目使用 GitHub Actions 自动发布到 GitHub 和 Docker Hub：
+
+1. **推送代码到 main 分支** → 自动构建并推送到 Docker Hub
+2. **创建 Git 标签** → 自动创建 GitHub Release 并同步到 Docker Hub
+
+### 手动发布
+
+```bash
+# 发布新版本（同时发布到 GitHub 和 Docker Hub）
+./release.sh v1.0.0
+
+# 或者只发布到 Docker Hub
+./publish.sh
+```
+
+### 版本管理
+
+- **GitHub Releases**：包含源码和发布说明
+- **Docker Hub**：包含 Docker 镜像，支持多标签
+- **自动同步**：GitHub Release 创建后自动同步到 Docker Hub
+
+### 用户更新
+
+```bash
+# 拉取最新版本
+docker pull your-username/foldershowcase:latest
+
+# 停止旧容器
+docker stop foldershowcase
+docker rm foldershowcase
+
+# 运行新版本
+docker run -d \
+  --name foldershowcase \
+  -p 1995:1995 \
+  -v /path/to/your/content:/app/content:ro \
+  your-username/foldershowcase:latest
+```
+
+## 📚 相关文档
+
+- [Docker 部署指南](DOCKER.md) - 详细的 Docker 使用说明
+- [项目结构说明](PROJECT_STRUCTURE.md) - 代码结构说明
+- [API 文档](API.md) - 后端 API 接口说明
+- [权限问题解决指南](../PERMISSION_FIX.md) - 解决 EACCES 权限错误
+- [群晖 NAS 部署指南](../SYNOLOGY.md) - 群晖 NAS 专用部署说明
+- [灵活部署指南](../FLEXIBLE_DEPLOYMENT.md) - 支持任意目录映射
 

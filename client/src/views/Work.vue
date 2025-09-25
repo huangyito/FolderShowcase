@@ -93,6 +93,9 @@ export default {
         const data = await api.getWorkDetail(categoryName.value, workName.value)
         work.value = data
         
+        // 设置页面标题
+        updatePageTitle()
+        
         // 等待DOM更新后设置视频自动播放
         await nextTick()
         setupVideoAutoplay()
@@ -101,6 +104,14 @@ export default {
         console.error('加载作品失败:', err)
       } finally {
         loading.value = false
+      }
+    }
+
+    // 更新页面标题
+    const updatePageTitle = () => {
+      if (work.value) {
+        const siteName = document.title.split(' - ')[0] || '作品集'
+        document.title = `${work.value.title} - ${siteName}`
       }
     }
 

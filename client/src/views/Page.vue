@@ -35,11 +35,21 @@ export default {
         error.value = ''
         const data = await api.getPage(pageName)
         page.value = data
+        // 设置页面标题
+        updatePageTitle()
       } catch (err) {
         error.value = '加载页面失败'
         console.error('加载页面失败:', err)
       } finally {
         loading.value = false
+      }
+    }
+
+    // 更新页面标题
+    const updatePageTitle = () => {
+      if (page.value) {
+        const siteName = document.title.split(' - ')[0] || '作品集'
+        document.title = `${page.value.title} - ${siteName}`
       }
     }
 

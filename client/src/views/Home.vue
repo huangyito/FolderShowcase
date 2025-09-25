@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '../api'
 
@@ -73,9 +73,17 @@ export default {
       try {
         const data = await api.getHomeConfig()
         homeConfig.value = data
+        // 设置页面标题
+        updatePageTitle()
       } catch (err) {
         console.error('加载首页配置失败:', err)
       }
+    }
+
+    // 更新页面标题
+    const updatePageTitle = () => {
+      const siteName = document.title.split(' - ')[0] || '作品集'
+      document.title = siteName
     }
 
     const goToWork = (categoryName, workName) => {

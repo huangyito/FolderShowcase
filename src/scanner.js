@@ -18,14 +18,14 @@ class PortfolioScanner {
     }
   }
 
-  // 获取所有分类（排除 home 文件夹）
+  // 获取所有分类（排除 home 文件夹和系统文件夹）
   async getCategories() {
     try {
       const items = await fs.readdir(this.contentDir, { withFileTypes: true });
       const categories = [];
 
       for (const item of items) {
-        if (item.isDirectory() && item.name !== 'home') {
+        if (item.isDirectory() && this.isValidCategory(item.name)) {
           const categoryPath = path.join(this.contentDir, item.name);
           const works = await this.getWorksByCategory(item.name);
           
@@ -43,6 +43,63 @@ class PortfolioScanner {
       console.error('扫描分类失败:', error);
       return [];
     }
+  }
+
+  // 检查是否为有效的分类文件夹
+  isValidCategory(name) {
+    // 排除系统文件夹和特殊文件夹
+    const excludeFolders = [
+      'home',
+      // 群晖 DSM 系统文件夹
+      '@eaDir',
+      '@Recycle',
+      '@tmp',
+      '@S2S',
+      '@sharesnap',
+      // 威联通 QNAP 系统文件夹
+      '@Recently-Snapshot',
+      // 通用系统文件夹
+      '.DS_Store',
+      'Thumbs.db',
+      '.Trash',
+      '.Trash-1000',
+      '.recycle',
+      'lost+found',
+      '.snapshot',
+      // 其他常见系统文件夹
+      '.AppleDouble',
+      '.AppleDB',
+      '.AppleDesktop',
+      '.fseventsd',
+      '.Spotlight-V100',
+      '.TemporaryItems',
+      '.VolumeIcon.icns',
+      '.com.apple.timemachine.donotpresent'
+    ];
+    
+    // 排除以特定前缀开头的文件夹
+    const excludePrefixes = [
+      '.',
+      '@',
+      '._',
+      '.Apple',
+      '.com.apple',
+      '@Recently-Snapshot-'
+    ];
+    
+    // 检查是否在排除列表中
+    if (excludeFolders.includes(name)) {
+      return false;
+    }
+    
+    // 检查是否以排除前缀开头
+    for (const prefix of excludePrefixes) {
+      if (name.startsWith(prefix)) {
+        return false;
+      }
+    }
+    
+    return true;
   }
 
   // 获取首页配置
@@ -88,7 +145,7 @@ class PortfolioScanner {
       const items = await fs.readdir(homePath, { withFileTypes: true });
 
       for (const item of items) {
-        if (item.isDirectory()) {
+        if (item.isDirectory() && this.isValidWork(item.name)) {
           const pagePath = path.join(homePath, item.name);
           const pageInfo = await this.getPageInfo(item.name, pagePath);
           if (pageInfo) {
@@ -179,7 +236,7 @@ class PortfolioScanner {
       const works = [];
 
       for (const item of items) {
-        if (item.isDirectory()) {
+        if (item.isDirectory() && this.isValidWork(item.name)) {
           const workPath = path.join(categoryPath, item.name);
           const workInfo = await this.getWorkInfo(categoryName, item.name, workPath);
           if (workInfo) {
@@ -193,6 +250,62 @@ class PortfolioScanner {
       console.error(`扫描分类 ${categoryName} 的作品失败:`, error);
       return [];
     }
+  }
+
+  // 检查是否为有效的作品文件夹
+  isValidWork(name) {
+    // 排除系统文件夹和特殊文件夹
+    const excludeFolders = [
+      // 群晖 DSM 系统文件夹
+      '@eaDir',
+      '@Recycle',
+      '@tmp',
+      '@S2S',
+      '@sharesnap',
+      // 威联通 QNAP 系统文件夹
+      '@Recently-Snapshot',
+      // 通用系统文件夹
+      '.DS_Store',
+      'Thumbs.db',
+      '.Trash',
+      '.Trash-1000',
+      '.recycle',
+      'lost+found',
+      '.snapshot',
+      // 其他常见系统文件夹
+      '.AppleDouble',
+      '.AppleDB',
+      '.AppleDesktop',
+      '.fseventsd',
+      '.Spotlight-V100',
+      '.TemporaryItems',
+      '.VolumeIcon.icns',
+      '.com.apple.timemachine.donotpresent'
+    ];
+    
+    // 排除以特定前缀开头的文件夹
+    const excludePrefixes = [
+      '.',
+      '@',
+      '._',
+      '.Apple',
+      '.com.apple',
+      '@Recently-Snapshot-'
+    ];
+    
+    // 检查是否在排除列表中
+    if (excludeFolders.includes(name)) {
+      return false;
+    }
+    
+    // 检查是否以排除前缀开头
+    for (const prefix of excludePrefixes) {
+      if (name.startsWith(prefix)) {
+        return false;
+      }
+    }
+    
+    return true;
   }
 
   // 获取作品基本信息
@@ -209,8 +322,8 @@ class PortfolioScanner {
         title = this.extractTitle(content);
       }
 
-      // 去掉标题中的 [推荐] 标记
-      title = title.replace(/\[推荐\]/g, '').trim();
+      // 清理标题中的多余空格
+      title = title.trim();
 
       // 查找封面图片
       const coverImage = await this.findCoverImage(workPath);
@@ -314,15 +427,8 @@ class PortfolioScanner {
         }
       }
 
-      // 按推荐标记排序，[推荐]标记的作品优先显示
-      return recommendedWorks.sort((a, b) => {
-        const aIsRecommended = a.name.includes('[推荐]');
-        const bIsRecommended = b.name.includes('[推荐]');
-        
-        if (aIsRecommended && !bIsRecommended) return -1;
-        if (!aIsRecommended && bIsRecommended) return 1;
-        return 0;
-      });
+      // 按标题排序，保持一致的显示顺序
+      return recommendedWorks.sort((a, b) => a.title.localeCompare(b.title));
     } catch (error) {
       console.error('获取推荐作品失败:', error);
       return [];
@@ -332,14 +438,16 @@ class PortfolioScanner {
   // 检查作品是否包含[推荐]标签
   async hasRecommendedTag(workPath) {
     try {
-      const workName = path.basename(workPath);
+      // 方法1：检查文件夹中是否存在文件名包含 [推荐] 的文件
+      const items = await fs.readdir(workPath, { withFileTypes: true });
       
-      // 方法1：检查文件夹名称是否包含 [推荐] 标记
-      if (workName.includes('[推荐]')) {
-        return true;
+      for (const item of items) {
+        if (item.isFile() && item.name.includes('[推荐]')) {
+          return true;
+        }
       }
       
-      // 方法2：检查 Markdown 文件中的 [推荐] 标签
+      // 方法2：检查 Markdown 文件中的 [推荐] 标签（保持向后兼容）
       const markdownFile = path.join(workPath, '作品介绍.md');
       if (await fs.pathExists(markdownFile)) {
         const content = await fs.readFile(markdownFile, 'utf-8');

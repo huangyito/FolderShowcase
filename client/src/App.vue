@@ -3,7 +3,7 @@
     <header class="header">
       <div class="container">
         <h1 class="logo">
-          <router-link to="/">作品集</router-link>
+          <router-link to="/">{{ siteConfig.siteName || '作品集' }}</router-link>
         </h1>
         <nav class="nav">
           <div class="nav-item dropdown">
@@ -38,14 +38,14 @@
 
     <footer class="footer">
       <div class="container">
-        <p>&copy; 2024 作品集. 保留所有权利.</p>
+        <p>&copy; 2024 {{ siteConfig.siteName || '作品集' }}. 保留所有权利.</p>
       </div>
     </footer>
   </div>
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import api from './api'
 
@@ -56,6 +56,7 @@ export default {
     const searchQuery = ref('')
     const categories = ref([])
     const navPages = ref([])
+    const siteConfig = ref({})
     const loading = ref(true)
 
     const search = () => {
@@ -85,9 +86,32 @@ export default {
       }
     }
 
+    const loadSiteConfig = async () => {
+      try {
+        const data = await api.getConfig()
+        siteConfig.value = data
+        // 设置页面标题
+        updatePageTitle()
+      } catch (error) {
+        console.error('加载网站配置失败:', error)
+      }
+    }
+
+    // 更新页面标题
+    const updatePageTitle = () => {
+      const siteName = siteConfig.value.siteName || '作品集'
+      document.title = siteName
+    }
+
+    // 监听 siteConfig 变化，动态更新页面标题
+    watch(siteConfig, () => {
+      updatePageTitle()
+    }, { deep: true })
+
     onMounted(() => {
       loadCategories()
       loadNavPages()
+      loadSiteConfig()
     })
 
     return {
@@ -95,6 +119,7 @@ export default {
       search,
       categories,
       navPages,
+      siteConfig,
       loading
     }
   }

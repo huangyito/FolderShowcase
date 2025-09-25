@@ -73,6 +73,8 @@ export default {
         error.value = ''
         const data = await api.getWorksByCategory(categoryName.value)
         works.value = data || []
+        // 设置页面标题
+        updatePageTitle()
       } catch (err) {
         error.value = '加载作品失败'
         console.error('加载作品失败:', err)
@@ -80,6 +82,12 @@ export default {
       } finally {
         loading.value = false
       }
+    }
+
+    // 更新页面标题
+    const updatePageTitle = () => {
+      const siteName = document.title.split(' - ')[0] || '作品集'
+      document.title = `${categoryName.value} - ${siteName}`
     }
 
     const goToWork = (workName) => {
