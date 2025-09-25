@@ -1,0 +1,374 @@
+/* 全局样式 - 参考 smirapdesigns.com */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.6;
+  color: #2c2c2c;
+  background-color: #fafafa;
+  overflow-x: hidden;
+}
+
+/* 容器 */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 30px;
+}
+
+/* 网格布局 - 参考 smirapdesigns.com */
+.grid {
+  display: grid;
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 30px;
+}
+
+.grid-2 {
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+}
+
+.grid-3 {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.grid-4 {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+/* 全宽网格布局 - 三列横向排列 */
+.full-width-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  padding: 0;
+}
+
+/* 全宽卡片样式 */
+.full-width-card {
+  width: 100%;
+  background: white;
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  border-right: 1px solid #f0f0f0;
+  transition: all 0.3s ease;
+}
+
+.full-width-card:hover {
+  background: #fafafa;
+}
+
+.full-width-card:last-child {
+  border-right: none;
+}
+
+/* 全宽卡片的图片容器 */
+.full-width-card .card-image-container {
+  height: 400px;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.full-width-card .card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.3s ease;
+}
+
+.full-width-card:hover .card-image {
+  transform: scale(1.05);
+}
+
+/* 全宽卡片的悬浮效果 */
+.full-width-card .card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 2;
+}
+
+.full-width-card:hover .card-overlay {
+  opacity: 1;
+}
+
+/* 全宽卡片的悬浮内容样式 */
+.full-width-card .overlay-content {
+  text-align: center;
+  color: white;
+  padding: 20px;
+  max-width: 90%;
+}
+
+.full-width-card .overlay-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: white;
+  line-height: 1.2;
+}
+
+.full-width-card .overlay-description {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.4;
+}
+
+/* 卡片样式 - 参考 smirapdesigns.com */
+.card {
+  background: white;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  border: 1px solid #f0f0f0;
+  position: relative;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  border-color: #ddd;
+}
+
+.card-image-container {
+  height: 350px;
+  overflow: hidden;
+  position: relative;
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.card:hover .card-image {
+  transform: scale(1.08);
+}
+
+.card-content {
+  padding: 25px;
+  background: white;
+}
+
+.card-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #2c2c2c;
+  line-height: 1.3;
+}
+
+.card-description {
+  color: #888;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 15px;
+}
+
+.card-meta {
+  font-size: 12px;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* 悬停覆盖层 - 参考 smirapdesigns.com 风格 */
+.card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 2;
+}
+
+.card:hover .card-overlay {
+  opacity: 1;
+}
+
+.overlay-content {
+  text-align: center;
+  color: white;
+  padding: 20px;
+  max-width: 90%;
+}
+
+.overlay-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: white;
+  line-height: 1.2;
+}
+
+.overlay-description {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  font-weight: 400;
+}
+
+/* 按钮样式 */
+.btn {
+  display: inline-block;
+  padding: 12px 24px;
+  background: #2c2c2c;
+  color: white;
+  text-decoration: none;
+  border-radius: 0;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  background: #444;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: #6c757d;
+}
+
+.btn-secondary:hover {
+  background: #545b62;
+}
+
+/* 确保详情页图片不受全局样式影响，图片间无间距 */
+.work-detail .markdown-content img {
+  width: 100vw !important;
+  height: auto !important;
+  margin: 0 !important;
+  object-fit: contain !important;
+  max-width: none !important;
+  max-height: none !important;
+  position: relative !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+/* 分割线样式 - 浅灰色 */
+.work-detail .markdown-content hr {
+  border: none !important;
+  height: 1px !important;
+  background-color: #e0e0e0 !important;
+  margin: 60px 0 !important;
+}
+
+.work-detail .markdown-content video {
+  width: 100vw !important;
+  height: auto !important;
+  margin: 0 !important;
+  object-fit: contain !important;
+  max-width: none !important;
+  max-height: none !important;
+  position: relative !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  background: #000 !important;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 20px;
+  }
+  
+  .grid-2,
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: 1fr;
+  }
+  
+  .card-image-container {
+    height: 280px;
+  }
+  
+  /* 移动端全宽卡片 */
+  .full-width-grid {
+    grid-template-columns: 1fr;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  
+  .full-width-card {
+    border-right: none;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .full-width-card:last-child {
+    border-bottom: none;
+  }
+  
+  .full-width-card .card-image-container {
+    height: 300px;
+  }
+  
+  /* 移动端悬浮效果 */
+  .full-width-card .overlay-title {
+    font-size: 20px;
+  }
+  
+  .full-width-card .overlay-description {
+    font-size: 12px;
+  }
+}
+
+/* 加载动画 */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  font-size: 18px;
+  color: #666;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #2c2c2c;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 15px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
