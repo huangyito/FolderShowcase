@@ -169,8 +169,10 @@ class MarkdownParser {
       // 如果是相对路径，转换为正确的路径
       if (!src.startsWith('http') && !src.startsWith('/')) {
         const relativePath = src.replace(/^\.\//, '');
+        // URL编码文件名，处理中文和特殊字符
+        const encodedFileName = encodeURIComponent(relativePath);
         // 构建完整的路径：/content/分类/作品/文件名
-        return `![${alt}](/content/${categoryName}/${workName}/${relativePath})`;
+        return `![${alt}](/content/${encodeURIComponent(categoryName)}/${encodeURIComponent(workName)}/${encodedFileName})`;
       }
       return match;
     });
@@ -180,8 +182,10 @@ class MarkdownParser {
       return match.replace(/src="([^"]+)"/g, (srcMatch, src) => {
         if (!src.startsWith('http') && !src.startsWith('/')) {
           const relativePath = src.replace(/^\.\//, '');
+          // URL编码文件名，处理中文和特殊字符
+          const encodedFileName = encodeURIComponent(relativePath);
           // 构建完整的路径：/content/分类/作品/文件名
-          return `src="/content/${categoryName}/${workName}/${relativePath}"`;
+          return `src="/content/${encodeURIComponent(categoryName)}/${encodeURIComponent(workName)}/${encodedFileName}"`;
         }
         return srcMatch;
       });

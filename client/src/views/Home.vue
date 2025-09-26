@@ -26,12 +26,33 @@
           class="full-width-card work-card"
           @click="goToWork(work.category, work.name)"
         >
+          <!-- 有封面图片的作品 -->
           <div v-if="work.coverImage" class="card-image-container">
             <img :src="`/content${work.coverImage}`" :alt="work.title" class="card-image" />
             <div class="card-overlay">
               <div class="overlay-content">
                 <h3 class="overlay-title">{{ work.title }}</h3>
                 <p class="overlay-description">{{ work.category }}</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 纯文本作品（只有.md文件） -->
+          <div v-else class="card-text-container">
+            <div class="text-card-content">
+              <div class="text-card-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.89 22 5.99 22H18C19.1 22 20 21.1 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M16 13H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M16 17H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M10 9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <h3 class="text-card-title">{{ work.title }}</h3>
+              <p class="text-card-category">{{ work.category }}</p>
+              <div class="text-card-description">
+                <span class="text-card-type">文档</span>
               </div>
             </div>
           </div>
@@ -135,11 +156,7 @@ export default {
   font-weight: 400;
 }
 
-/* 首页 Markdown 内容段间距 */
-.hero :deep(p) {
-  margin-bottom: 20px;
-}
-
+/* 首页 Hero 区域特殊样式 */
 .hero :deep(h1) {
   font-size: 72px;
   font-weight: 700;
@@ -150,38 +167,8 @@ export default {
   line-height: 1.1;
 }
 
-.hero :deep(h2),
-.hero :deep(h3),
-.hero :deep(h4),
-.hero :deep(h5),
-.hero :deep(h6) {
-  margin-top: 30px;
-  margin-bottom: 15px;
-}
-
-.hero :deep(ul),
-.hero :deep(ol) {
+.hero :deep(p) {
   margin-bottom: 20px;
-  padding-left: 20px;
-}
-
-.hero :deep(li) {
-  margin-bottom: 8px;
-}
-
-.hero :deep(blockquote) {
-  margin: 20px 0;
-  padding: 15px 20px;
-  border-left: 4px solid #e0e0e0;
-  background-color: #f9f9f9;
-  font-style: italic;
-}
-
-.hero :deep(hr) {
-  margin: 30px 0;
-  border: none;
-  height: 1px;
-  background-color: #e0e0e0;
 }
 
 .works-grid {
@@ -215,6 +202,81 @@ export default {
   z-index: 2;
 }
 
+/* 纯文本卡片样式 */
+.card-text-container {
+  height: 400px;
+  width: 100%;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.card-text-container:hover {
+  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+  transform: translateY(-2px);
+}
+
+.text-card-content {
+  text-align: center;
+  padding: 40px;
+  max-width: 80%;
+}
+
+.text-card-icon {
+  color: #6c757d;
+  margin-bottom: 20px;
+  transition: color 0.3s ease;
+}
+
+.card-text-container:hover .text-card-icon {
+  color: #495057;
+}
+
+.text-card-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #2c2c2c;
+  margin-bottom: 12px;
+  line-height: 1.3;
+  transition: color 0.3s ease;
+}
+
+.card-text-container:hover .text-card-title {
+  color: #1a1a1a;
+}
+
+.text-card-category {
+  font-size: 16px;
+  color: #6c757d;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+.text-card-description {
+  margin-top: 20px;
+}
+
+.text-card-type {
+  display: inline-block;
+  background: rgba(108, 117, 125, 0.1);
+  color: #6c757d;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+.card-text-container:hover .text-card-type {
+  background: rgba(108, 117, 125, 0.2);
+  color: #495057;
+}
+
 .error {
   text-align: center;
   padding: 80px 40px;
@@ -243,6 +305,22 @@ export default {
   
   .works-grid {
     padding: 60px 0;
+  }
+  
+  .card-text-container {
+    height: 300px;
+  }
+  
+  .text-card-content {
+    padding: 30px 20px;
+  }
+  
+  .text-card-title {
+    font-size: 20px;
+  }
+  
+  .text-card-category {
+    font-size: 14px;
   }
 }
 

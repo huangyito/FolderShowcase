@@ -215,53 +215,7 @@ export default {
   background: white;
 }
 
-/* 内容容器 - 添加阅读边距 */
-.markdown-content {
-  margin: 0 auto;
-  max-width: 800px;
-  padding: 0 40px;
-  line-height: 1.8;
-  color: #666;
-  font-size: 16px;
-}
-
-/* 标题样式 */
-.markdown-content h1,
-.markdown-content h2,
-.markdown-content h3,
-.markdown-content h4,
-.markdown-content h5,
-.markdown-content h6 {
-  margin: 60px 0 30px 0;
-  color: #444;
-  font-weight: 600;
-  line-height: 1.2;
-}
-
-.markdown-content h1 {
-  font-size: 42px;
-  border-bottom: 2px solid #eee;
-  padding-bottom: 20px;
-  text-align: center;
-}
-
-.markdown-content h2 {
-  font-size: 32px;
-  margin-top: 80px;
-}
-
-.markdown-content h3 {
-  font-size: 26px;
-}
-
-/* 段落样式 */
-.markdown-content p {
-  margin-bottom: 30px;
-  font-size: 16px;
-  line-height: 1.8;
-  text-align: justify;
-  color: #666;
-}
+/* Work.vue 使用全局统一的 .markdown-content 样式 */
 
 /* 图片样式 - 实现 Behance 效果，图片间无间距 */
 .markdown-content img {
@@ -341,34 +295,7 @@ export default {
   display: none !important;
 }
 
-/* 列表样式 */
-.markdown-content ul,
-.markdown-content ol {
-  margin: 30px 0;
-  padding-left: 40px;
-}
-
-.markdown-content li {
-  margin-bottom: 15px;
-  font-size: 16px;
-  line-height: 1.7;
-  color: #666;
-}
-
-/* 引用样式 */
-.markdown-content blockquote {
-  border-left: 6px solid #2c2c2c;
-  padding: 30px 40px;
-  margin: 60px 0;
-  background: #f8f9fa;
-  border-radius: 0 12px 12px 0;
-  font-style: italic;
-  color: #777;
-  font-size: 20px;
-  line-height: 1.6;
-}
-
-/* 代码样式 */
+/* Work.vue 特有的代码样式 */
 .markdown-content code {
   background: #f1f3f4;
   padding: 4px 10px;
@@ -393,27 +320,6 @@ export default {
   padding: 0;
   color: #333;
   font-size: 16px;
-}
-
-/* 链接样式 */
-.markdown-content a {
-  color: #555;
-  text-decoration: none;
-  font-weight: 500;
-  border-bottom: 2px solid transparent;
-  transition: border-bottom-color 0.3s ease;
-}
-
-.markdown-content a:hover {
-  border-bottom-color: #555;
-}
-
-/* 分割线样式 */
-.markdown-content hr {
-  border: none;
-  height: 1px;
-  background-color: #e0e0e0;
-  margin: 60px 0;
 }
 
 /* 媒体画廊样式 */
@@ -495,50 +401,9 @@ export default {
     padding: 60px 0;
   }
   
-  .markdown-content {
-    font-size: 14px;
-    padding: 0 20px;
-    max-width: 100%;
-  }
-  
-  .markdown-content h1 {
-    font-size: 32px;
-    margin: 40px 0 20px 0;
-  }
-  
-  .markdown-content h2 {
-    font-size: 26px;
-    margin: 60px 0 20px 0;
-  }
-  
-  .markdown-content h3 {
-    font-size: 22px;
-  }
-  
-  .markdown-content p {
-    font-size: 14px;
-    margin-bottom: 20px;
-  }
-  
   .markdown-content img,
   .markdown-content video {
     margin: 30px 0;
-  }
-  
-  .markdown-content blockquote {
-    padding: 20px 25px;
-    margin: 40px 0;
-    font-size: 18px;
-  }
-  
-  .markdown-content ul,
-  .markdown-content ol {
-    padding-left: 25px;
-  }
-  
-  .markdown-content li {
-    font-size: 14px;
-    margin-bottom: 10px;
   }
   
   .nav-buttons {

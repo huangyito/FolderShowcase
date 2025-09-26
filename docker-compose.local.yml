@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  foldershowcase:
+    image: whsyqihong/foldershowcase:latest
+    container_name: foldershowcase-local
+    ports:
+      - "1995:1995"
+    volumes:
+      # 挂载本地内容目录到容器
+      - /Volumes/作品集/作品网站:/app/content:ro
+      # 挂载修改后的代码文件
+      - ./src/parser.js:/app/src/parser.js:ro
+      - ./src/scanner.js:/app/src/scanner.js:ro
+      # 挂载日志目录
+      - ./logs:/app/logs
+    environment:
+      - NODE_ENV=development
+      - PORT=1995
+      - CONTENT_DIR=/app/content
+    restart: unless-stopped
+    networks:
+      - foldershowcase-network
+
+networks:
+  foldershowcase-network:
+    driver: bridge

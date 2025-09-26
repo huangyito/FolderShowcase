@@ -29,6 +29,48 @@
             {{ page.title }}
           </router-link>
         </nav>
+        
+        <!-- 移动端汉堡菜单按钮 -->
+        <button class="mobile-menu-toggle" @click="toggleMobileMenu">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+        
+        <!-- 移动端菜单 -->
+        <div class="mobile-menu" :class="{ 'mobile-menu-open': mobileMenuOpen }">
+          <div class="mobile-menu-content">
+            <div class="mobile-nav-item">
+              <router-link to="/" class="mobile-nav-link" @click="closeMobileMenu">全部作品</router-link>
+            </div>
+            <div 
+              v-for="category in categories" 
+              :key="category.name"
+              class="mobile-nav-item"
+            >
+              <router-link 
+                :to="`/category/${encodeURIComponent(category.name)}`" 
+                class="mobile-nav-link"
+                @click="closeMobileMenu"
+              >
+                {{ category.name }}
+              </router-link>
+            </div>
+            <div 
+              v-for="page in navPages" 
+              :key="page.name"
+              class="mobile-nav-item"
+            >
+              <router-link 
+                :to="`/page/${encodeURIComponent(page.name)}`" 
+                class="mobile-nav-link"
+                @click="closeMobileMenu"
+              >
+                {{ page.title }}
+              </router-link>
+            </div>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -58,6 +100,7 @@ export default {
     const navPages = ref([])
     const siteConfig = ref({})
     const loading = ref(true)
+    const mobileMenuOpen = ref(false)
 
     const search = () => {
       if (searchQuery.value.trim()) {
@@ -103,6 +146,15 @@ export default {
       document.title = siteName
     }
 
+    // 移动端菜单控制
+    const toggleMobileMenu = () => {
+      mobileMenuOpen.value = !mobileMenuOpen.value
+    }
+
+    const closeMobileMenu = () => {
+      mobileMenuOpen.value = false
+    }
+
     // 监听 siteConfig 变化，动态更新页面标题
     watch(siteConfig, () => {
       updatePageTitle()
@@ -120,7 +172,10 @@ export default {
       categories,
       navPages,
       siteConfig,
-      loading
+      loading,
+      mobileMenuOpen,
+      toggleMobileMenu,
+      closeMobileMenu
     }
   }
 }
@@ -272,6 +327,84 @@ export default {
   margin: 0;
 }
 
+/* 移动端菜单按钮 */
+.mobile-menu-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 30px;
+  height: 30px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1001;
+}
+
+.hamburger-line {
+  width: 100%;
+  height: 3px;
+  background: #2c2c2c;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+/* 移动端菜单 */
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.mobile-menu-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobile-menu-content {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 280px;
+  height: 100%;
+  background: white;
+  padding: 80px 0 20px 0;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  overflow-y: auto;
+}
+
+.mobile-menu-open .mobile-menu-content {
+  transform: translateX(0);
+}
+
+.mobile-nav-item {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.mobile-nav-link {
+  display: block;
+  padding: 16px 24px;
+  color: #666;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.mobile-nav-link:hover,
+.mobile-nav-link.router-link-active {
+  background: #f8f9fa;
+  color: #2c2c2c;
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
   .container {
@@ -292,9 +425,17 @@ export default {
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .nav {
     display: none;
+  }
+  
+  .mobile-menu-toggle {
+    display: flex;
+  }
+  
+  .container {
+    justify-content: space-between;
   }
 }
 </style>

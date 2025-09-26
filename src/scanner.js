@@ -311,15 +311,44 @@ class PortfolioScanner {
   // 获取作品基本信息
   async getWorkInfo(category, workName, workPath) {
     try {
-      const markdownFile = path.join(workPath, '作品介绍.md');
+      let markdownFile = null;
       let title = workName; // 默认使用文件夹名称作为标题
       let content = '';
 
-      // 检查是否存在 Markdown 文件
-      if (await fs.pathExists(markdownFile)) {
-        // 读取 Markdown 文件的第一行作为标题
-        content = await fs.readFile(markdownFile, 'utf-8');
-        title = this.extractTitle(content);
+      console.log(`🔍 扫描作品: ${category}/${workName}`);
+      console.log(`📁 工作路径: ${workPath}`);
+
+      // 查找文件夹中的任何.md文件
+      try {
+        const items = await fs.readdir(workPath, { withFileTypes: true });
+        const mdFiles = items.filter(item => item.isFile() && item.name.endsWith('.md'));
+        
+        if (mdFiles.length > 0) {
+          // 优先使用"作品介绍.md"，如果没有则使用第一个找到的.md文件
+          const preferredFile = mdFiles.find(file => file.name === '作品介绍.md');
+          const selectedFile = preferredFile || mdFiles[0];
+          markdownFile = path.join(workPath, selectedFile.name);
+          
+          console.log(`📄 找到Markdown文件: ${selectedFile.name}`);
+          console.log(`📄 完整路径: ${markdownFile}`);
+        } else {
+          console.log(`⚠️  未找到任何.md文件`);
+          console.log(`📂 目录内容:`, items.map(item => item.name));
+        }
+      } catch (dirError) {
+        console.error(`❌ 无法读取目录:`, dirError);
+      }
+      
+      // 如果找到Markdown文件，读取内容
+      if (markdownFile && await fs.pathExists(markdownFile)) {
+        try {
+          content = await fs.readFile(markdownFile, 'utf-8');
+          title = this.extractTitle(content);
+          console.log(`✅ 成功读取Markdown文件，标题: ${title}`);
+        } catch (readError) {
+          console.error(`❌ 读取Markdown文件失败:`, readError);
+          console.log(`📊 文件信息:`, await this.getFileInfo(markdownFile));
+        }
       }
 
       // 清理标题中的多余空格
@@ -348,22 +377,60 @@ class PortfolioScanner {
   async getWorkDetail(category, workName) {
     try {
       const workPath = path.join(this.contentDir, category, workName);
-      const markdownFile = path.join(workPath, '作品介绍.md');
+      let markdownFile = null;
+
+      console.log(`🔍 获取作品详情: ${category}/${workName}`);
+      console.log(`📁 工作路径: ${workPath}`);
 
       let title = workName; // 默认使用文件夹名称作为标题
       let content = '';
       let parsedContent = null;
 
-      // 检查是否存在 Markdown 文件
-      if (await fs.pathExists(markdownFile)) {
-        content = await fs.readFile(markdownFile, 'utf-8');
-        title = this.extractTitle(content);
+      // 查找文件夹中的任何.md文件
+      try {
+        const items = await fs.readdir(workPath, { withFileTypes: true });
+        const mdFiles = items.filter(item => item.isFile() && item.name.endsWith('.md'));
         
-        // 移除一级标题，避免重复显示
-        const contentWithoutTitle = this.removeFirstTitle(content);
-        
-        // 解析 Markdown 内容（不包含一级标题）
-        parsedContent = await this.parser.parseMarkdown(contentWithoutTitle, workPath);
+        if (mdFiles.length > 0) {
+          // 优先使用"作品介绍.md"，如果没有则使用第一个找到的.md文件
+          const preferredFile = mdFiles.find(file => file.name === '作品介绍.md');
+          const selectedFile = preferredFile || mdFiles[0];
+          markdownFile = path.join(workPath, selectedFile.name);
+          
+          console.log(`📄 找到Markdown文件: ${selectedFile.name}`);
+          console.log(`📄 完整路径: ${markdownFile}`);
+        } else {
+          console.log(`⚠️  未找到任何.md文件`);
+          console.log(`📂 目录内容:`, items.map(item => item.name));
+        }
+      } catch (dirError) {
+        console.error(`❌ 无法读取目录:`, dirError);
+      }
+      
+      // 如果找到Markdown文件，读取并解析内容
+      if (markdownFile && await fs.pathExists(markdownFile)) {
+        try {
+          content = await fs.readFile(markdownFile, 'utf-8');
+          title = this.extractTitle(content);
+          console.log(`✅ 成功读取Markdown文件，标题: ${title}`);
+          console.log(`📝 文件内容长度: ${content.length} 字符`);
+          
+          // 移除一级标题，避免重复显示
+          const contentWithoutTitle = this.removeFirstTitle(content);
+          
+          // 解析 Markdown 内容（不包含一级标题）
+          parsedContent = await this.parser.parseMarkdown(contentWithoutTitle, workPath);
+          console.log(`🎨 Markdown解析完成`);
+        } catch (readError) {
+          console.error(`❌ 读取Markdown文件失败:`, readError);
+          console.log(`📊 文件信息:`, await this.getFileInfo(markdownFile));
+          
+          // 读取失败时，创建一个简单的 HTML 结构
+          parsedContent = {
+            html: `<h1>${workName}</h1><p>这是一个作品展示页面。</p>`,
+            metadata: {}
+          };
+        }
       } else {
         // 没有 Markdown 文件时，创建一个简单的 HTML 结构
         parsedContent = {
@@ -484,7 +551,9 @@ class PortfolioScanner {
       for (const item of items) {
         const ext = path.extname(item).toLowerCase();
         if (imageExtensions.includes(ext)) {
-          return path.join(workPath, item).replace(this.contentDir, '');
+          const relativePath = path.join(workPath, item).replace(this.contentDir, '');
+          // URL编码路径，处理中文和特殊字符
+          return relativePath.split('/').map(segment => encodeURIComponent(segment)).join('/');
         }
       }
       return null;
@@ -503,9 +572,12 @@ class PortfolioScanner {
       for (const item of items) {
         const ext = path.extname(item).toLowerCase();
         if (mediaExtensions.includes(ext)) {
+          const relativePath = path.join(workPath, item).replace(this.contentDir, '');
+          // URL编码路径，处理中文和特殊字符
+          const encodedPath = relativePath.split('/').map(segment => encodeURIComponent(segment)).join('/');
           mediaFiles.push({
             name: item,
-            path: path.join(workPath, item).replace(this.contentDir, ''),
+            path: encodedPath,
             type: this.getMediaType(ext)
           });
         }
@@ -529,6 +601,29 @@ class PortfolioScanner {
       return 'video';
     }
     return 'unknown';
+  }
+
+  // 获取文件详细信息（用于调试）
+  async getFileInfo(filePath) {
+    try {
+      const stats = await fs.stat(filePath);
+      return {
+        exists: true,
+        size: stats.size,
+        isFile: stats.isFile(),
+        isDirectory: stats.isDirectory(),
+        mtime: stats.mtime,
+        mode: stats.mode.toString(8),
+        uid: stats.uid,
+        gid: stats.gid
+      };
+    } catch (error) {
+      return {
+        exists: false,
+        error: error.message,
+        code: error.code
+      };
+    }
   }
 }
 

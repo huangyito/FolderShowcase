@@ -97,53 +97,7 @@ export default {
   background: #fff;
 }
 
-.markdown-content {
-  margin: 0 auto;
-  max-width: 800px;
-  padding: 0 40px;
-  line-height: 1.8;
-  color: #666;
-  font-size: 16px;
-}
-
-.markdown-content p {
-  margin-bottom: 20px;
-}
-
-.markdown-content h1,
-.markdown-content h2,
-.markdown-content h3,
-.markdown-content h4,
-.markdown-content h5,
-.markdown-content h6 {
-  margin-top: 30px;
-  margin-bottom: 15px;
-}
-
-.markdown-content ul,
-.markdown-content ol {
-  margin-bottom: 20px;
-  padding-left: 20px;
-}
-
-.markdown-content li {
-  margin-bottom: 8px;
-}
-
-.markdown-content blockquote {
-  margin: 20px 0;
-  padding: 15px 20px;
-  border-left: 4px solid #e0e0e0;
-  background-color: #f9f9f9;
-  font-style: italic;
-}
-
-.markdown-content hr {
-  margin: 30px 0;
-  border: none;
-  height: 1px;
-  background-color: #e0e0e0;
-}
+/* Page.vue 使用全局统一的 .markdown-content 样式 */
 
 .empty {
   text-align: center;
